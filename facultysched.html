@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ACCAPP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.24/sweetalert2.all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- header -->
+    <nav class="navbar bg-body-info fixed-top"  style="background-color:#055de6;">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="dashboard.html" style="color: whitesmoke;">ACADEMIC CONCERN AND CONSULTATION SCHEDULING SYSTEM</a>
+
+        <a class="nav-link active" aria-current="page" href="#" id="userDetails"></a><br/>
+        <button class="btn btn-outline-primary" type="button" id="signOutBtn">Sign Out</button>
+        
+      </div>
+    </nav>
+    <!-- end of header -->
+    
+    <!-- menu -->
+     <br/><br/><br/>
+     <div class="container-fluid">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="dashboard.html">Dashboard</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Maintenance</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="adduser.html">+User</a></li>
+                <li><a class="dropdown-item" href="addfaculty.html">Faculty</a></li>
+                <li><a class="dropdown-item" href="addstudent.html">Student</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown"></li>
+                <a class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Consultation</a>
+                <ul class="dropdown-menu">
+                <li><a class="dropdown-item active" href="facultysched.html">Faculty Availability</a></li>
+                  <li><a class="dropdown-item" href="studreq.html">Student Request</a></li>
+                  <li><a class="dropdown-item" href="studreqdecline.html">Student Request Declined</a></li>
+                  <li><a class="dropdown-item" href="sfcon.html">Student and Faculty</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Concern</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item active" href="compstudent.html">by Student</a></li>
+                  <li><a class="dropdown-item" href="compfaculty.html">by Faculty</a></li>
+                </ul>
+              </li>
+              <li class="nav-item"></li>
+              <a class="nav-link" href="callteacher.html">Calling Teacher</a>
+              </li>
+              <li class="nav-item"></li>
+                <a class="nav-link" href="report.html">Reports</a>
+              </li>
+              
+            
+          </ul>
+     </div>
+    <!-- end of  menu -->
+
+    <!-- content -->
+    <br/>
+    <div class="container-fluid">
+        <h3 class="text-center text-primary">Faculty Consultation Hours</h3>
+        <br/>
+
+        <div class="container text-center">
+            <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+            <div class="row">
+
+              <div class="col-md-5 border border-primary p-2 mb-2">
+                <div class="form-floating mb-3" id="search-container">
+                  <input type="text" class="form-control" id="search-box" onkeyup="filterLinks()">
+                  <label for="floatingInput" class="text-success">search by lastname...</label>
+                </div>
+                <!-- First List Group for displaying items -->
+                <div id="data-container">
+                  <h6>List of Faculty:</h6>
+                  <div id="data-links"></div>
+              </div>
+              </div>
+
+              <div class="col-md-7 border border-warning p-2 mb-2">
+                <!-- Second List Group for displaying additional data when a link is clicked -->
+                <div id="details-container" class="details">
+                  <h2>Details:</h2>
+                  <div id="details"></div> <!-- Ensure this div exists and has the correct ID -->
+                  <button onclick="goBack()">Go Back</button>
+              </div>
+              </div>
+
+            </div>
+        </div>
+        
+    </div>
+    <!-- end of content -->
+
+
+  <script type="module">
+   // Import the functions you need from the SDKs you need
+   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+   import { getFirestore, doc, getDocs, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+   import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+   // TODO: Add SDKs for Firebase products that you want to use
+   // https://firebase.google.com/docs/web/setup#available-libraries
+
+   // Your web app's Firebase configuration
+   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+   const firebaseConfig = {
+     apiKey: "AIzaSyC23VFp5TVrteSahdnLyuGMkJg8R2EjVWw",
+     authDomain: "accapp-a65e4.firebaseapp.com",
+     //databaseURL: "https://accapp-a65e4-default-rtdb.firebaseio.com",
+     projectId: "accapp-a65e4",
+     storageBucket: "accapp-a65e4.appspot.com",
+     messagingSenderId: "703785259381",
+     appId: "1:703785259381:web:77a5728e081d078152c33c",
+     measurementId: "G-1R6LN7C9EV"
+   };
+
+
+   // Initialize Firebase
+   const app = initializeApp(firebaseConfig);
+   const db = getFirestore(app);
+
+    // Set to hold distinct values
+    const distinctItems = new Set();
+
+    // Function to load distinct data from the Firestore collection
+    async function loadDistinctData() {
+      const collectionRef = collection(db, 'FacultyConsultationHours'); // Replace with your collection name
+      const dataContainer = document.getElementById('data-links');
+      document.getElementById('details-container').style.display = 'none'; // Hide details
+      try {
+          const querySnapshot = await getDocs(collectionRef);
+          querySnapshot.forEach((doc) => {
+              const itemData = doc.data();
+              const distinctValue = itemData.TeacherName; // Change this to the field you want distinct values from
+
+              if (!distinctItems.has(distinctValue)) {
+                  distinctItems.add(distinctValue);
+                  const itemLink = document.createElement('a');
+                  itemLink.textContent = distinctValue; // Display distinct value
+                  itemLink.href = "#";
+                  itemLink.onclick = () => showDetails(distinctValue); // Pass distinct value to fetch details
+                  itemLink.style.display = "block"; // Display as block for better visibility
+                  dataContainer.appendChild(itemLink);
+              }
+          });
+      } catch (error) {
+          console.error('Error fetching data from Firestore: ', error);
+      }
+  }
+
+   // Function to show details for a clicked distinct item from all documents
+   async function showDetails(distinctValue) {
+    const detailsContainer = document.getElementById('details-container');
+    const detailsElement = document.getElementById('details');
+    const collectionRef = collection(db, 'FacultyConsultationHours'); // Replace with your collection name
+
+    try {
+        // Create a query to get all details of the clicked distinct value
+        const querySnapshot = await getDocs(collectionRef);
+        
+        if (!querySnapshot.empty) {
+            let detailsHtml = "";
+            querySnapshot.forEach((doc) => {
+                const detailData = doc.data();
+                // Check if the current document's field matches the distinct value
+                if (detailData.TeacherName === distinctValue) {
+                    detailsHtml += `
+                      <strong>Name:</strong> ${detailData.TeacherName} <br>
+                    <strong>Date:</strong> ${detailData.SelectedDate} <br>
+                    <strong>Hour:</strong> ${detailData.ConsultationHour} <br>
+                    <strong>Status:</strong> ${detailData.Status} <br><br>
+                    `; // Add more fields as necessary
+                }
+            });
+            // Update the innerHTML of the details element
+            if (detailsHtml) {
+              detailsElement.innerHTML = detailsHtml;
+          } else {
+              detailsElement.innerHTML = "No details found for this item.";
+          }
+            detailsContainer.style.display = 'block'; // Show details
+            //document.getElementById('data-container').style.display = 'none'; // Hide links
+            //document.getElementById('search-container').style.display = 'none'; // Hide search
+        } else {
+            detailsElement.innerHTML = "No details found for this item.";
+        }
+    } catch (error) {
+        console.error('Error fetching details from Firestore: ', error);
+    }
+}
+   
+
+    // Function to filter displayed links based on search input
+    function filterLinks() {
+      const input = document.getElementById('search-box').value.toLowerCase();
+      const links = document.getElementById('data-links').getElementsByTagName('a');
+
+      for (let i = 0; i < links.length; i++) {
+          const linkText = links[i].textContent || links[i].innerText;
+          links[i].style.display = linkText.toLowerCase().includes(input) ? '' : 'none';
+      }
+    }
+
+    // Attach filterLinks to the window object for global access
+    window.filterLinks = filterLinks;
+
+    // Function to go back to the list of links
+    function goBack() {
+      document.getElementById('details-container').style.display = 'none'; // Hide details
+      document.getElementById('data-container').style.display = 'block'; // Show links
+      document.getElementById('search-container').style.display = 'block'; // Show search
+  }
+    // Attach to the window object for global access
+    window.goBack = goBack;
+    // Load distinct data when the page loads
+    window.onload = loadDistinctData;
+         
+//user log credentials
+   // Retrieve user data from session storage
+   const userData = JSON.parse(sessionStorage.getItem('userData'));
+
+if (userData) {
+if(userData.access == 1){
+ document.getElementById('userDetails').innerHTML = 
+  `
+     <Label style="color: whitesmoke;">${userData.firstname}</label>
+     <Label style="color: whitesmoke;"> ${userData.lastname}</Label>
+     <Label style="color: whitesmoke;">    **School Administrator</Label>
+ `;
+
+}else if(userData.access == 2){
+ document.getElementById('userDetails').innerHTML = 
+  `
+     <Label style="color: whitesmoke;">${userData.firstname}</label>
+     <Label style="color: whitesmoke;"> ${userData.lastname}</Label>
+     <Label style="color: whitesmoke;">    **Academic Head</Label>
+ `;
+}else{
+ document.getElementById('userDetails').innerHTML = 
+  `
+     <Label style="color: whitesmoke;">${userData.firstname}</label>
+     <Label style="color: whitesmoke;"> ${userData.lastname}</Label>
+     <Label style="color: whitesmoke;">    **Program Head</Label>
+ `;
+}
+ 
+} else {
+ window.location.href = 'index.html';  // Redirect to login if no session data
+}
+
+ // Handle Sign Out with SweetAlert confirmation
+ document.getElementById('signOutBtn').addEventListener('click', function() {
+  Swal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, sign me out!'
+  }).then((result) => {
+      if (result.isConfirmed) {
+          const auth = getAuth();
+          
+          signOut(auth).then(() => {
+              // Clear session storage
+              sessionStorage.clear();
+
+              // Show success message
+              Swal.fire(
+                  'Signed Out!',
+                  'You have successfully signed out.',
+                  'success'
+              ).then(() => {
+                  // Redirect to login page after sign-out
+                  window.location.href = 'index.html';
+              });
+          }).catch((error) => {
+              Swal.fire('Error', 'Sign-out failed: ' + error.message, 'error');
+          });
+      }
+  });
+});
+    </script>
+  </body>
+
+  
+
+</html>

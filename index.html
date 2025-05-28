@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ACCAP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.24/sweetalert2.all.js"></script>
+  </head>
+  <body class="bg-primary">
+    <div class="container text-center">
+        <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+        <div class="row">
+          <div class="text-bg-primary"><h1 class="mb-1">ACADEMIC CONCERN AND CONSULTATION SCHEDULING SYSTEM</h1></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="container text-center">
+            <div class="row">
+              <div class="col-8">
+                
+                <img src="images/sti1.png" class="rounded-4" style="height: 100%; width: 90%;"  alt="">
+              </div>
+              <div class="col-4 bg-primary-subtle rounded-4">
+                <!-- login form -->
+                 <br/> 
+                 <h2 class="mb-3">Sign-In User</h2> 
+                 <form id="loginForm">
+                  <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" placeholder="Enter Email Address" required>
+                    <label for="floatingInput">Email address</label>
+                  </div>
+                  <div class="form-floating">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                    <label for="floatingPassword">Password</label>
+                  </div>
+                  <br/>
+                  <button type="submit"  class="btn btn-primary" style="float: center">Log-in</button>
+                </form>
+                  <br/><br/>
+                  <a href="apk/accapp.apk" download><strong><h3></strong>click here to Download ACCAPP Mobile App</strong></h3></a>
+                  <br/>
+                  <!-- <p><a href="#" class="link-danger link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Forgot Password?</a></p> -->
+                  <br/>
+                  <p><strong>About the system: An Academic Concern and Consultation Scheduling APP has been thoughtfully created to help mostly the college students and teachers of STI College Caloocan to manage the consultation problems and establish a more efficient way on communicating about the academical problems of the students. By utilizing ACCAPP, students can be more productive on their academic tracts, teachers solving individual problems of their students can result to a more productive students and better relationship of student and teachers.</strong></p>
+              </div>
+              
+            </div>
+          </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+      import { getFirestore,  doc, getDoc} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyC23VFp5TVrteSahdnLyuGMkJg8R2EjVWw",
+        authDomain: "accapp-a65e4.firebaseapp.com",
+        //databaseURL: "https://accapp-a65e4-default-rtdb.firebaseio.com/",
+        projectId: "accapp-a65e4",
+        storageBucket: "accapp-a65e4.appspot.com",
+        messagingSenderId: "703785259381",
+        appId: "1:703785259381:web:77a5728e081d078152c33c",
+        measurementId: "G-1R6LN7C9EV"
+      };
+    
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+     // Login form submission handler
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // Sign in with Firebase Authentication
+    signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Welcome to ACCAPP",
+                    showConfirmButton: false,
+                    timer: 1000
+                  });
+            const userId = userCredential.user.uid;
+
+            // Retrieve user data from Firestore
+            const docRef = doc(db, 'SystemUser', userId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+
+                // Store data in session storage
+                sessionStorage.setItem('userData', JSON.stringify(userData));
+
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+               
+            } else {
+                console.error("No user data found!");
+            }
+        })
+        .catch((error) => {
+          Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: "Wrong Username or Password",
+                    showConfirmButton: false,
+                    timer: 1000
+                  });
+            //console.error("Authentication error: ", error.message);
+        });
+});
+    </script>
+  
+  </body>
+</html>
